@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:WrightLogs.ViewModels"
+             xmlns:models="using:WrightLogs.Models"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+             x:Class="WrightLogs.Views.UsageView"
+             x:DataType="vm:UsageViewModel">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Chart View / Usage Detail tabs -->
+        <TabControl Grid.Row="0" TabStripPlacement="Bottom" SelectedIndex="{Binding ActiveTabIndex}">
+            <TabItem Header="Chart View">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <!-- Point-in-time scan toolbar -->
+                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="8,8,8,0" ColumnSpacing="12">
+                        <Button Grid.Column="0" Content="Scan Usage Details" Command="{Binding ArmScanCommand}" />
+                        <TextBlock Grid.Column="1" Text="{Binding ScanPromptText}" VerticalAlignment="Center" Opacity="0.8" />
+                    </Grid>
+
+                    <!-- Chart -->
+                    <lvc:CartesianChart x:Name="Chart"
+                                        Grid.Row="1"
+                                        Series="{Binding Series}"
+                                        XAxes="{Binding XAxes}"
+                                        Sections="{Binding Sections}"
+                                        ZoomMode="None"
+                                        Margin="8,0,8,0" />
+
+                    <!-- Metric toggle bar -->
+                    <Border Grid.Row="2" Margin="8" Padding="8" BorderBrush="DarkGray" BorderThickness="1" CornerRadius="4">
+                        <StackPanel>
+                            <TextBlock Text="Metric Toggles" FontWeight="Bold" Margin="0,0,0,6" />
+                            <ItemsControl ItemsSource="{Binding Metrics}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:UsageMetricToggle">
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsChecked}"
+                                                  Foreground="{Binding LineBrush}"
+                                                  PointerEntered="OnMetricPointerEntered"
+                                                  PointerExited="OnMetricPointerExited"
+                                                  Margin="0,0,12,4" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Usage Detail">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8">
+                        <TextBlock Grid.Column="0" Text="{Binding UsageDetailStatusText}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Searching..."
+                                   FontWeight="Bold"
+                                   IsVisible="{Binding IsScanningUsageDetails}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Margin="8,0,8,8">
+                        <ItemsControl ItemsSource="{Binding UsageDetailBlocks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:UsageDetailBlock">
+                                    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="4" Margin="0,0,0,8" Padding="8">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+                                                       FontWeight="Bold"
+                                                       Margin="0,0,0,4" />
+                                            <SelectableTextBlock Text="{Binding Text}" FontFamily="Consolas,Menlo,monospace" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Status bar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="8">
+            <TextBlock Grid.Column="0" Text="{Binding StatusText}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Working..." IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+</UserControl>

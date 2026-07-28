@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<d:multistatus xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns" xmlns:oc="http://owncloud.org/ns"
+               xmlns:nc="http://nextcloud.org/ns">
+    <d:response>
+        <d:href>/public.php/webdav/</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Wed, 08 Jul 2026 18:27:40 GMT</d:getlastmodified>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+                <d:quota-used-bytes>188001782</d:quota-used-bytes>
+                <d:quota-available-bytes>-3</d:quota-available-bytes>
+                <d:getetag>&quot;6a4e969c81aad&quot;</d:getetag>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/public.php/webdav/wrightlogs.mac.0.0.0.1.zip</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Wed, 08 Jul 2026 18:19:18 GMT</d:getlastmodified>
+                <d:getcontentlength>43877662</d:getcontentlength>
+                <d:resourcetype/>
+                <d:getetag>&quot;298fa339a57a51b3cab91a7fce1338d5&quot;</d:getetag>
+                <d:getcontenttype>application/zip</d:getcontenttype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/public.php/webdav/wrightlogs.win.0.0.0.1.zip</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Wed, 08 Jul 2026 18:22:16 GMT</d:getlastmodified>
+                <d:getcontentlength>71094609</d:getcontentlength>
+                <d:resourcetype/>
+                <d:getetag>&quot;425091b03dd552046ef3596098997dfa&quot;</d:getetag>
+                <d:getcontenttype>application/zip</d:getcontenttype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/public.php/webdav/dimwit.win.1.1.0.7.zip</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Wed, 08 Jul 2026 18:27:40 GMT</d:getlastmodified>
+                <d:getcontentlength>36557597</d:getcontentlength>
+                <d:resourcetype/>
+                <d:getetag>&quot;40f72ed44651c66ade359c595786f856&quot;</d:getetag>
+                <d:getcontenttype>application/zip</d:getcontenttype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/public.php/webdav/dimwit.current.zip</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Thu, 25 Jun 2026 23:02:36 GMT</d:getlastmodified>
+                <d:getcontentlength>36471914</d:getcontentlength>
+                <d:resourcetype/>
+                <d:getetag>&quot;7c9d17fd493a7b140b8f949acce82b5e&quot;</d:getetag>
+                <d:getcontenttype>application/zip</d:getcontenttype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+</d:multistatus>

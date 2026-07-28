@@ -1,0 +1,270 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:WrightLogs.ViewModels"
+             xmlns:models="using:WrightLogs.Models"
+             xmlns:conv="using:WrightLogs.Converters"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+             x:Class="WrightLogs.Views.LogView"
+             x:DataType="vm:LogViewerViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="DataGrid.logEntries">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="GridLinesVisibility" Value="All" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="CanUserResizeColumns" Value="True" />
+            <Setter Property="Margin" Value="8,8,8,0" />
+        </Style>
+        <Style Selector="DataGrid.logEntries SelectableTextBlock">
+            <Setter Property="ContextFlyout" Value="{x:Null}" />
+        </Style>
+        <Style Selector="DataGrid.logEntries DataGridCell">
+            <Setter Property="Padding" Value="4,0" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Filter bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="8" ColumnSpacing="12">
+            <ItemsControl Grid.Column="0" ItemsSource="{Binding LevelFilters}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="8" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LogLevelFilterItem">
+                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsChecked}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding SearchFields}"
+                          SelectedItem="{Binding SelectedSearchField}"
+                          VerticalAlignment="Center"
+                          MinWidth="110" />
+                <TextBox Grid.Column="1"
+                         Text="{Binding SearchText}"
+                         PlaceholderText="Search..."
+                         VerticalAlignment="Center" />
+            </Grid>
+        </Grid>
+
+        <!-- Full Log / Tagged Entries tabs -->
+        <SplitView Grid.Row="1"
+                   IsPaneOpen="{Binding IsDetailPaneOpen}"
+                   DisplayMode="Overlay"
+                   PanePlacement="Bottom"
+                   OpenPaneLength="340">
+        <SplitView.Pane>
+            <Border Background="{DynamicResource SystemAltHighColor}"
+                    BorderBrush="{DynamicResource SystemBaseLowColor}"
+                    BorderThickness="0,1,0,0">
+                <Grid RowDefinitions="Auto,Auto,*" Margin="16,12,16,16" RowSpacing="8">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Log Detail" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="Close" Command="{Binding CloseDetailCommand}" Padding="10,4" />
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="24">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Log #:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.LogNumber}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Timestamp:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss.fff'}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Level:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.Level}"
+                                       Foreground="{Binding DetailEntry.Level, Converter={x:Static conv:LogLevelToBrushConverter.Instance}}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Session:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.SessionId}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Thread:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.ThreadId}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Category:" Opacity="0.7" />
+                            <TextBlock Text="{Binding DetailEntry.Category}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="2">
+                        <StackPanel Spacing="12">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Message" FontWeight="SemiBold" Opacity="0.7" FontSize="12" />
+                                <SelectableTextBlock Text="{Binding DetailEntry.MessageTemplate}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="4"
+                                        IsVisible="{Binding DetailEntry.Exception, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <TextBlock Text="Stack Trace" FontWeight="SemiBold" Opacity="0.7" FontSize="12" />
+                                <SelectableTextBlock Text="{Binding DetailEntry.Exception}"
+                                           TextWrapping="Wrap"
+                                           FontFamily="Consolas,Menlo,monospace" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </SplitView.Pane>
+
+        <TabControl TabStripPlacement="Bottom">
+            <TabItem Header="Full Log">
+                <DataGrid x:Name="FullLogGrid"
+                          Classes="logEntries"
+                          ItemsSource="{Binding Entries}"
+                          CellPointerPressed="OnCellPointerPressed">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="LogNumber" Width="90" MinWidth="50" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding LogNumber}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Timestamp" Width="180" MinWidth="100" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss.fff'}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Level" Width="90" MinWidth="50" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Level}"
+                                               Foreground="{Binding Level, Converter={x:Static conv:LogLevelToBrushConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Thread" Width="70" MinWidth="40" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding ThreadId}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="InstanceName" Width="110" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding InstanceName}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="SessionId" Width="140" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding SessionId}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Category" Width="140" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Category}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Message" Width="*" MinWidth="150" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding MessageTemplate}"
+                                               Foreground="{Binding Level, Converter={x:Static conv:LogLevelToBrushConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Tagged Entries">
+                <DataGrid x:Name="TaggedGrid"
+                          Classes="logEntries"
+                          ItemsSource="{Binding TaggedEntries}"
+                          CellPointerPressed="OnCellPointerPressed">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="LogNumber" Width="90" MinWidth="50" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding LogNumber}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Timestamp" Width="180" MinWidth="100" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss.fff'}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Level" Width="90" MinWidth="50" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Level}"
+                                               Foreground="{Binding Level, Converter={x:Static conv:LogLevelToBrushConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Thread" Width="70" MinWidth="40" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding ThreadId}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="InstanceName" Width="110" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding InstanceName}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="SessionId" Width="140" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding SessionId}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Category" Width="140" MinWidth="60" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding Category}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Message" Width="*" MinWidth="150" CanUserResize="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="models:LogEntry">
+                                    <SelectableTextBlock Text="{Binding MessageTemplate}"
+                                               Foreground="{Binding Level, Converter={x:Static conv:LogLevelToBrushConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+        </SplitView>
+
+        <!-- Status bar -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="8">
+            <TextBlock Grid.Column="0" Text="{Binding StatusText}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Working..." IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+</UserControl>

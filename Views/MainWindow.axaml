@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WrightLogs.ViewModels"
+        xmlns:views="using:WrightLogs.Views"
+        xmlns:models="using:WrightLogs.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        x:Class="WrightLogs.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/logs.ico"
+        Title="WrightLogs">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0" Padding="8" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemBaseLowColor}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Open Folder..." Click="OnOpenFolderClick" />
+                <ComboBox ItemsSource="{Binding FolderFiles}"
+                          SelectedItem="{Binding SelectedFile}"
+                          PlaceholderText="Select a file..."
+                          MinWidth="260">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:FolderFileEntry">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding Icon}" />
+                                <TextBlock Text="{Binding FileName}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Content="Load" Command="{Binding LoadSelectedFileCommand}" />
+                <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+                <CheckBox Content="Live Tail" IsChecked="{Binding LogViewer.IsLiveTailEnabled}" IsVisible="{Binding IsLogViewActive}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding LogViewer.OpenFilePath}" IsVisible="{Binding IsLogViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" />
+                <TextBlock Text="{Binding Usage.OpenFilePath}" IsVisible="{Binding IsUsageViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" />
+                <HyperlinkButton Click="UpdateButtonClickEvent" Content="{Binding UpdateVersionText}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" HorizontalAlignment="Right" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" IsVisible="{Binding IsLogViewActive}">
+            <views:LogView DataContext="{Binding LogViewer}" />
+        </Border>
+        <Border Grid.Row="1" IsVisible="{Binding IsUsageViewActive}">
+            <views:UsageView DataContext="{Binding Usage}" />
+        </Border>
+    </Grid>
+
+</Window>
