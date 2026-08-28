@@ -60,7 +60,8 @@
                    IsPaneOpen="{Binding IsDetailPaneOpen}"
                    DisplayMode="Overlay"
                    PanePlacement="Bottom"
-                   OpenPaneLength="340">
+                   OpenPaneLength="340"
+                   PaneClosed="SplitView_OnPaneClosed">
         <SplitView.Pane>
             <Border Background="{DynamicResource SystemAltHighColor}"
                     BorderBrush="{DynamicResource SystemBaseLowColor}"

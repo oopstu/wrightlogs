@@ -104,4 +104,14 @@ public partial class LogView : UserControl
         menu.Items.Add(viewDetailMenuItem);
         menu.Open(e.Row);
     }
+    
+    private void SplitView_OnPaneClosed(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not LogViewerViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.IsDetailPaneOpen = false;
+    }
 }
