@@ -35,8 +35,10 @@
                 <Button Content="Load" Command="{Binding LoadSelectedFileCommand}" />
                 <Button Content="Refresh" Command="{Binding RefreshCommand}" />
                 <CheckBox Content="Live Tail" IsChecked="{Binding LogViewer.IsLiveTailEnabled}" IsVisible="{Binding IsLogViewActive}" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding LogViewer.OpenFilePath}" IsVisible="{Binding IsLogViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" />
-                <TextBlock Text="{Binding Usage.OpenFilePath}" IsVisible="{Binding IsUsageViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" />
+                <SelectableTextBlock Text="{Binding LogViewer.OpenFilePath}" IsVisible="{Binding IsLogViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" 
+                                     ToolTip.Tip="{Binding LogViewer.OpenFilePath}" />
+                <SelectableTextBlock Text="{Binding Usage.OpenFilePath}" IsVisible="{Binding IsUsageViewActive}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" 
+                                     ToolTip.Tip="{Binding Usage.OpenFilePath}" />
                 <HyperlinkButton Click="UpdateButtonClickEvent" Content="{Binding UpdateVersionText}" VerticalAlignment="Center" Opacity="0.7" Margin="12,0,0,0" HorizontalAlignment="Right" />
             </StackPanel>
         </Border>

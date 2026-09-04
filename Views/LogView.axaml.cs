@@ -10,6 +10,7 @@ namespace WrightLogs.Views;
 public partial class LogView : UserControl
 {
     private Window? _window;
+    private ContextMenu? _contextMenu = null;
 
     public LogView()
     {
@@ -84,7 +85,14 @@ public partial class LogView : UserControl
             return;
         }
 
+        if (_contextMenu is not null)
+        {
+            _contextMenu.Close();
+            _contextMenu.Items.Clear();
+        }
+
         var isTagged = viewModel.IsRowTagged(entry.RowIndex);
+        _contextMenu = new ContextMenu();
         var tagMenuItem = new MenuItem
         {
             Header = isTagged ? "Untag Line" : "Tag Line",
@@ -98,10 +106,9 @@ public partial class LogView : UserControl
             Command = viewModel.ViewDetailCommand,
             CommandParameter = entry,
         };
-
-        var menu = new ContextMenu();
-        menu.Items.Add(tagMenuItem);
-        menu.Items.Add(viewDetailMenuItem);
-        menu.Open(e.Row);
+        
+        _contextMenu.Items.Add(tagMenuItem);
+        _contextMenu.Items.Add(viewDetailMenuItem);
+        _contextMenu.Open(e.Row);
     }
 }

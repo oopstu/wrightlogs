@@ -154,11 +154,15 @@ public partial class LogViewerViewModel : ViewModelBase, IDisposable
         }
 
         DetailEntry = entry;
+        IsDetailPaneOpen = false;
         IsDetailPaneOpen = true;
     }
 
     [RelayCommand]
     private void CloseDetail() => IsDetailPaneOpen = false;
+
+    [RelayCommand]
+    private void PanelCloseEvent() => IsDetailPaneOpen = false;
 
     partial void OnIsLiveTailEnabledChanged(bool value)
     {
